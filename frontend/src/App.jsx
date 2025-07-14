@@ -27,8 +27,8 @@ function App() {
       setPartLinks(null);
     } catch (err) {
       setResponse({ message: 'Upload failed' });
-      console.error(err);
       setPartLinks(null);
+      console.error(err);
     }
   };
 
@@ -39,6 +39,7 @@ function App() {
         params: { part_number: response.part_number }
       });
       setPartLinks(res.data);
+      console.log("partLinks:", res.data); // Debug
     } catch (err) {
       setPartLinks({ error: 'Lookup failed' });
       console.error(err);
@@ -77,6 +78,26 @@ function App() {
           )}
         </div>
       )}
+      {/* Show eBay detailed results */}
+      {partLinks?.ebay_results && partLinks.ebay_results.length > 0 && (
+        <div style={{ marginTop: 20 }}>
+          <strong>eBay Top Results:</strong>
+          <div style={{ display: "flex", flexDirection: "column", gap: "20px" }}>
+            {partLinks.ebay_results.map((item, idx) => (
+              <div key={idx} style={{ border: "1px solid #333", padding: 10, borderRadius: 8, background: "#222" }}>
+                <a href={item.listing_url} target="_blank" rel="noopener noreferrer" style={{ textDecoration: "none", color: "#66f" }}>
+                  <img src={item.image_url} alt={item.title} style={{ width: 120, marginBottom: 8, borderRadius: 5 }} />
+                  <div style={{ fontWeight: "bold", fontSize: 16 }}>{item.title}</div>
+                </a>
+                <div>Price: {item.price}</div>
+                {item.brand && <div>Brand: {item.brand}</div>}
+                {item.compatibility && <div>Compatibility: {item.compatibility}</div>}
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+      {/* Existing: Buy / Info Links */}
       {partLinks && !partLinks.error && (
         <div style={{ marginTop: 10 }}>
           <strong>Buy / Info Links:</strong>

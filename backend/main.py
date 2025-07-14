@@ -1,11 +1,13 @@
 from fastapi import FastAPI, File, UploadFile
 from fastapi.responses import JSONResponse
 from fastapi.middleware.cors import CORSMiddleware
+from bs4 import BeautifulSoup
 import easyocr
 from PIL import Image
 import numpy as np
 import io
 import re
+import httpx
 
 app = FastAPI()
 
@@ -52,14 +54,48 @@ async def upload_image(file: UploadFile = File(...)):
 
 @app.get("/partinfo/")
 async def part_info(part_number: str):
-    # Generate URLs for Google, eBay, Amazon searches
     google_url = f"https://www.google.com/search?q={part_number}"
     ebay_url = f"https://www.ebay.com/sch/i.html?_nkw={part_number}"
     amazon_url = f"https://www.amazon.com/s?k={part_number}"
+
+    results = []
+
+    try:
+        headers = {
+            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64)"
+        }
+        async with httpx.AsyncClient(timeout=15.0) as client:
+            ebay_resp = await client.get(ebay_url, headers=headers)
+            soup = BeautifulSoup(ebay_resp.text, "html.parser")
+            # Find all eBay results
+            items = soup.find_all("li", class_="s-item")
+            for item in items[:3]:  # Top 3 results
+                title_tag = item.find("h3", class_="s-item__title")
+                price_tag = item.find("span", class_="s-item__price")
+                img_tag = item.find("img", class_="s-item__image-img")
+                link_tag = item.find("a", class_="s-item__link")
+                subtitle_tag = item.find("div", class_="s-item__subtitle")
+                brand = None
+                brand_tag = item.find("span", class_="s-item__dynamic")
+                if brand_tag:
+                    brand = brand_tag.text.strip()
+                # Only add results with a title, price, image, and link
+                if title_tag and price_tag and img_tag and link_tag:
+                    results.append({
+                        "title": title_tag.text.strip(),
+                        "price": price_tag.text.strip(),
+                        "image_url": img_tag["src"],
+                        "listing_url": link_tag["href"],
+                        "brand": brand,
+                        "compatibility": subtitle_tag.text.strip() if subtitle_tag else None,
+                    })
+    except Exception as e:
+        results = []
 
     return JSONResponse(content={
         "part_number": part_number,
         "google_url": google_url,
         "ebay_url": ebay_url,
-        "amazon_url": amazon_url
+        "amazon_url": amazon_url,
+        "ebay_results": results
     })
