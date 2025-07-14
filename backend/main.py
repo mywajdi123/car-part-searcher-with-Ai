@@ -9,10 +9,10 @@ import re
 
 app = FastAPI()
 
-# CORS config
+# Enable CORS for frontend
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # For dev; tighten for prod
+    allow_origins=["*"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -48,4 +48,18 @@ async def upload_image(file: UploadFile = File(...)):
         "message": "Image uploaded successfully.",
         "detected_texts": detected_texts,
         "part_number": part_number
+    })
+
+@app.get("/partinfo/")
+async def part_info(part_number: str):
+    # Generate URLs for Google, eBay, Amazon searches
+    google_url = f"https://www.google.com/search?q={part_number}"
+    ebay_url = f"https://www.ebay.com/sch/i.html?_nkw={part_number}"
+    amazon_url = f"https://www.amazon.com/s?k={part_number}"
+
+    return JSONResponse(content={
+        "part_number": part_number,
+        "google_url": google_url,
+        "ebay_url": ebay_url,
+        "amazon_url": amazon_url
     })
