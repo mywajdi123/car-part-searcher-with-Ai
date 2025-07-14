@@ -39,6 +39,16 @@ function App() {
           <div><strong>Message:</strong> {response.message}</div>
           {response.filename && <div><strong>Filename:</strong> {response.filename}</div>}
           {response.size_kb && <div><strong>Size (KB):</strong> {response.size_kb}</div>}
+          {response.detected_texts && response.detected_texts.length > 0 && (
+            <div>
+              <strong>Detected Texts:</strong>
+              <ul>
+                {response.detected_texts.map((text, idx) => (
+                  <li key={idx}>{text}</li>
+                ))}
+              </ul>
+            </div>
+          )}
         </div>
       )}
     </div>

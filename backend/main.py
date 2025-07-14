@@ -1,13 +1,16 @@
 from fastapi import FastAPI, File, UploadFile
 from fastapi.responses import JSONResponse
 from fastapi.middleware.cors import CORSMiddleware
+import easyocr
+from PIL import Image
+import numpy as np
+import io
 
 app = FastAPI()
 
-# Enable CORS so frontend can connect
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # In production, restrict this!
+    allow_origins=["*"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -19,11 +22,20 @@ def read_root():
 
 @app.post("/upload/")
 async def upload_image(file: UploadFile = File(...)):
-    # For now, just confirm upload and echo filename
     content = await file.read()
     size_kb = round(len(content) / 1024, 2)
+
+    # OCR processing
+    image = Image.open(io.BytesIO(content)).convert("RGB")
+    np_img = np.array(image)
+
+    reader = easyocr.Reader(['en'], gpu=False)
+    result = reader.readtext(np_img)
+    detected_texts = [text for (_, text, _) in result]
+
     return JSONResponse(content={
         "filename": file.filename,
         "size_kb": size_kb,
-        "message": "Image uploaded successfully."
+        "message": "Image uploaded successfully.",
+        "detected_texts": detected_texts
     })
