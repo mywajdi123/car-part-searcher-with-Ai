@@ -39,12 +39,13 @@ function App() {
         params: { part_number: response.part_number }
       });
       setPartLinks(res.data);
-      console.log("partLinks:", res.data); // Debug
+      console.log("partLinks:", res.data);   // <-- This should always print, unless never called
     } catch (err) {
       setPartLinks({ error: 'Lookup failed' });
-      console.error(err);
+      console.error("Lookup failed:", err);
     }
   };
+
 
   return (
     <div style={{ padding: 40 }}>
@@ -66,6 +67,7 @@ function App() {
               </button>
             </div>
           )}
+
           {response.detected_texts && response.detected_texts.length > 0 && (
             <div style={{ marginTop: 10 }}>
               <strong>Detected Texts:</strong>
