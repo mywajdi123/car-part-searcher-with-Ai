@@ -9,6 +9,11 @@ import io
 import re
 import httpx
 from car_ai import CarPartAI
+import os
+from dotenv import load_dotenv
+
+# Load environment variables
+load_dotenv(dotenv_path=os.path.join(os.path.dirname(__file__), ".env"))
 
 app = FastAPI()
 
