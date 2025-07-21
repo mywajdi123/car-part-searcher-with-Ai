@@ -1,0 +1,11 @@
+# Ignore environment file with API keys
+.env
+
+# Python cache files
+__pycache__/
+*.py[cod]
+
+# VSCode, system files, logs
+.vscode/
+.DS_Store
+*.log

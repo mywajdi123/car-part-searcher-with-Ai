@@ -1,0 +1,6 @@
+# Ignore Python virtual environment
+venv/
+
+# Optional: ignore system + IDE files globally
+.DS_Store
+.vscode/

@@ -35,6 +35,9 @@ function App() {
     formData.append('file', file);
 
     try {
+      console.log("API_URL:", API_URL);
+      console.log("Posting to:", `${API_URL}/upload/`);
+
       const res = await fetch(`${API_URL}/upload/`, {
         method: 'POST',
         body: formData,
