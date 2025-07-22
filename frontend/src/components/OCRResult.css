@@ -1,0 +1,23 @@
+.part-number-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  list-style: none;
+  padding: 0;
+  margin-top: 0.5rem;
+}
+
+.part-number-item {
+  background-color: #f3f3f3;
+  padding: 0.5rem 0.8rem;
+  border-radius: 8px;
+  font-family: monospace;
+  border: 1px solid #ccc;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.part-number-item:hover {
+  background-color: #dceeff;
+  border-color: #3399ff;
+}

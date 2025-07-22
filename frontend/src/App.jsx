@@ -1,5 +1,7 @@
 import { useState } from 'react';
 import './App.css';
+import OCRResult from './components/OCRResult';
+
 const API_URL = import.meta.env.VITE_API_URL;
 
 function App() {
@@ -193,7 +195,8 @@ function App() {
                     </div>
                   </div>
                 )}
-
+                {/* Enhanced with part number extraction */}
+                <OCRResult ocrText={response.detected_texts.join('\n')} />
                 {/* Detected Texts */}
                 {response.detected_texts && response.detected_texts.length > 0 && (
                   <div className="detected-texts-section">
@@ -262,7 +265,7 @@ function App() {
           </div>
         )}
       </div>
-    </div>
+    </div >
   );
 }
 
