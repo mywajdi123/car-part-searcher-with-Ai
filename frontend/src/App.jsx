@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import './App.css';
 import OCRResult from './components/OCRResult';
+import CompatibilityView from './components/CompatibilityView';
 
 const API_URL = import.meta.env.VITE_API_URL;
 
@@ -11,12 +12,16 @@ function App() {
   const [partLinks, setPartLinks] = useState(null);
   const [loading, setLoading] = useState(false);
   const [lookupLoading, setLookupLoading] = useState(false);
+  const [selectedPart, setSelectedPart] = useState(null);
+  const [compatibilityData, setCompatibilityData] = useState(null);
 
   const handleFileChange = (e) => {
     const selectedFile = e.target.files[0];
     setFile(selectedFile);
     setResponse(null);
     setPartLinks(null);
+    setSelectedPart(null);
+    setCompatibilityData(null);
 
     // Create preview
     if (selectedFile) {
@@ -33,21 +38,34 @@ function App() {
     if (!file) return;
 
     setLoading(true);
+    setResponse(null);
+    setSelectedPart(null);
+    setCompatibilityData(null);
+
     const formData = new FormData();
     formData.append('file', file);
 
     try {
       console.log("API_URL:", API_URL);
-      console.log("Posting to:", `${API_URL}/upload/`);
-
-      const res = await fetch(`${API_URL}/upload/`, {
+      // Use the new enhanced endpoint
+      const endpoint = `${API_URL}/api/predict`;
+      console.log("Posting to:", endpoint);
+      
+      const res = await fetch(endpoint, {
         method: 'POST',
         body: formData,
       });
-      const data = await res.json();
 
+      const data = await res.json();
+      
       if (res.ok) {
         setResponse(data);
+        setCompatibilityData(data); // Store the enhanced data
+        
+        // Auto-select part if one was found
+        if (data.part_number) {
+          setSelectedPart(data.part_number);
+        }
       } else {
         setResponse({ error: data.error || 'Upload failed' });
       }
@@ -59,12 +77,21 @@ function App() {
     }
   };
 
-  const handlePartInfo = async () => {
-    if (!response?.part_number) return;
+  const handlePartClick = (partNumber) => {
+    setSelectedPart(partNumber);
+    // Automatically trigger part info lookup when a part is selected
+    if (partNumber && !partLinks) {
+      handlePartInfo(partNumber);
+    }
+  };
+
+  const handlePartInfo = async (partNumber = null) => {
+    const searchPart = partNumber || response?.part_number;
+    if (!searchPart) return;
 
     setLookupLoading(true);
     try {
-      const res = await fetch(`${API_URL}/partinfo/?part_number=${encodeURIComponent(response.part_number)}`);
+      const res = await fetch(`${API_URL}/partinfo/?part_number=${encodeURIComponent(searchPart)}`);
       const data = await res.json();
       setPartLinks(data);
     } catch (err) {
@@ -117,11 +144,22 @@ function App() {
           </button>
         </div>
 
-        {/* Results Section */}
+        {/* Enhanced Results Section using OCRResult component */}
         {response && (
           <div className="results-section">
-            <h2>📋 Analysis Results</h2>
+            <OCRResult 
+              result={response} 
+              selectedPart={selectedPart}
+              onPartClick={handlePartClick}
+              loading={loading}
+            />
+          </div>
+        )}
 
+        {/* Legacy display for backward compatibility - only show if no enhanced data */}
+        {response && !response.ai_analysis && !response.database_result && (
+          <div className="legacy-results-section">
+            <h2>📋 Analysis Results</h2>
             {response.error ? (
               <div className="error-message">
                 ❌ {response.error}
@@ -186,7 +224,7 @@ function App() {
                         <div className="part-number">{response.part_number}</div>
                       </div>
                       <button
-                        onClick={handlePartInfo}
+                        onClick={() => handlePartInfo()}
                         disabled={lookupLoading}
                         className="lookup-button"
                       >
@@ -195,8 +233,7 @@ function App() {
                     </div>
                   </div>
                 )}
-                {/* Enhanced with part number extraction */}
-                <OCRResult ocrText={response.detected_texts.join('\n')} />
+
                 {/* Detected Texts */}
                 {response.detected_texts && response.detected_texts.length > 0 && (
                   <div className="detected-texts-section">
@@ -215,11 +252,22 @@ function App() {
           </div>
         )}
 
+        {/* Standalone Compatibility View - only show if user selected a part but no integrated view */}
+        {selectedPart && compatibilityData && !response?.ai_analysis && (
+          <div className="compatibility-section">
+            <h2>🚗 Compatibility Information</h2>
+            <CompatibilityView 
+              data={compatibilityData}
+              loading={false}
+              error={null}
+            />
+          </div>
+        )}
+
         {/* Shopping Results */}
         {partLinks && (
           <div className="shopping-section">
             <h2>🛒 Where to Buy</h2>
-
             {partLinks.error ? (
               <div className="error-message">
                 ❌ {partLinks.error}
@@ -265,7 +313,7 @@ function App() {
           </div>
         )}
       </div>
-    </div >
+    </div>
   );
 }
 
