@@ -29,18 +29,19 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+
 def extract_part_numbers(texts):
     part_patterns = [
         r'^[A-Z0-9]{3,6}-[A-Z0-9]{2,4}-[A-Z0-9]{2,6}$',
         r'^[A-Z0-9]{4,10}-[A-Z0-9]{3,6}$',
         r'^[A-Z0-9]{6,12}$',
         r'^[0-9]{8,12}$',
-        r'^[A-Z]{2,4}[0-9]{4,8}[A-Z]?$', 
+        r'^[A-Z]{2,4}[0-9]{4,8}[A-Z]?$',
         r'^[0-9]{2,4}-[0-9]{3,6}-[0-9]{2,4}$',
     ]
-    
+
     potential_parts = []
-    
+
     for text in texts:
         cleaned = re.sub(r'[^\w-]', '', text.upper())
         for pattern in part_patterns:
@@ -50,28 +51,35 @@ def extract_part_numbers(texts):
                     'cleaned': cleaned,
                     'confidence': len(cleaned)
                 })
-    
+
     if potential_parts:
         best_match = max(potential_parts, key=lambda x: x['confidence'])
         return best_match['cleaned']
-    
+
     return None
+
 
 @app.get("/")
 def read_root():
     return {"message": "Car Parts AI Backend is running!"}
 
 # ✅ New: Match frontend call to /api/predict
+
+
 @app.post("/api/predict")
 async def predict_api(file: UploadFile = File(...)):
     return await process_image(file)
 
 # Optional: legacy route still works
+
+
 @app.post("/upload/")
 async def upload_image(file: UploadFile = File(...)):
     return await process_image(file)
 
 # Shared logic for both upload endpoints
+
+
 async def process_image(file: UploadFile):
     try:
         content = await file.read()
@@ -88,26 +96,82 @@ async def process_image(file: UploadFile):
 
         reader = easyocr.Reader(['en'], gpu=False)
         result = reader.readtext(np_img)
-        detected_texts = [text for (_, text, confidence) in result if confidence > 0.5]
+        detected_texts = [
+            text for (_, text, confidence) in result if confidence > 0.5]
 
+        # Extract part numbers using existing function
         part_number = extract_part_numbers(detected_texts)
-        car_info = await car_ai.identify_car_part(content, detected_texts)
 
-        return JSONResponse(content={
+        # Get AI analysis with enhanced compatibility detection
+        ai_analysis = await car_ai.identify_car_part(content, detected_texts)
+
+        # Search parts database for additional compatibility info
+        database_result = None
+        if part_number:
+            database_result = await parts_db.search_part_by_number(part_number)
+
+        # Combine AI analysis with database results
+        enhanced_response = {
             "filename": file.filename,
             "size_kb": size_kb,
             "message": "Image processed successfully",
             "detected_texts": detected_texts,
             "part_number": part_number,
             "texts_found": len(detected_texts),
-            "car_info": car_info
-        })
+
+            # Enhanced AI analysis
+            "ai_analysis": ai_analysis,
+
+            # Database compatibility results
+            "database_result": {
+                "found": database_result is not None,
+                "data": {
+                    "part_name": database_result.part_name if database_result else None,
+                    "category": database_result.category if database_result else None,
+                    "compatibility": [
+                        {
+                            "make": comp.make,
+                            "model": comp.model,
+                            "years": comp.years,
+                            "engines": comp.engines,
+                            "confidence": comp.confidence,
+                            "notes": comp.notes
+                        } for comp in database_result.compatibility
+                    ] if database_result else [],
+                    "interchangeable": [
+                        {
+                            "part_number": part.part_number,
+                            "brand": part.brand,
+                            "type": part.type,
+                            "price_range": part.price_range
+                        } for part in database_result.interchangeable
+                    ] if database_result else [],
+                    "specifications": database_result.specifications if database_result else {}
+                } if database_result else None
+            },
+
+            # Combined confidence score
+            "overall_confidence": (
+                (ai_analysis.get('confidence_scores', {}).get('overall', 0.5) +
+                 (database_result.confidence if database_result else 0.3)) / 2
+            ),
+
+            # Data sources used
+            "sources": {
+                "ocr": "easyocr",
+                "ai_vision": "openai_gpt4o" if ai_analysis.get('ai_used') else "rule_based",
+                "parts_database": database_result.source if database_result else "not_found"
+            }
+        }
+
+        return JSONResponse(content=enhanced_response)
 
     except Exception as e:
         return JSONResponse(
             status_code=500,
             content={"error": f"Processing failed: {str(e)}"}
         )
+
 
 @app.get("/partinfo/")
 async def part_info(part_number: str):

@@ -1,23 +1,37 @@
 .part-number-list {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.5rem;
-  list-style: none;
-  padding: 0;
-  margin-top: 0.5rem;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    list-style: none;
+    padding: 0;
+    margin-top: 0.5rem;
 }
 
 .part-number-item {
-  background-color: #f3f3f3;
-  padding: 0.5rem 0.8rem;
-  border-radius: 8px;
-  font-family: monospace;
-  border: 1px solid #ccc;
-  cursor: pointer;
-  transition: all 0.2s ease;
+    background-color: #f3f3f3;
+    padding: 0.5rem 0.8rem;
+    border-radius: 8px;
+    font-family: monospace;
+    border: 1px solid #ccc;
+    cursor: pointer;
+    transition: all 0.2s ease;
 }
 
 .part-number-item:hover {
-  background-color: #dceeff;
-  border-color: #3399ff;
+    background-color: #dceeff;
+    border-color: #3399ff;
+}
+
+.part-number-item.selected {
+    background-color: #d0ebff;
+    border-color: #007bff;
+}
+
+.part-info-box {
+    background: #fdfdfd;
+    border: 1px solid #ddd;
+    padding: 1rem;
+    margin-top: 1.5rem;
+    border-radius: 10px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
 }
