@@ -11,6 +11,7 @@ import httpx
 from car_ai import CarPartAI
 import os
 from dotenv import load_dotenv
+from parts_database import parts_db
 
 # Load environment variables
 load_dotenv(dotenv_path=os.path.join(os.path.dirname(__file__), ".env"))
@@ -76,8 +77,6 @@ async def predict_api(file: UploadFile = File(...)):
 @app.post("/upload/")
 async def upload_image(file: UploadFile = File(...)):
     return await process_image(file)
-
-# Shared logic for both upload endpoints
 
 
 async def process_image(file: UploadFile):
@@ -224,3 +223,8 @@ async def part_info(part_number: str):
         "results_count": len(results),
         "error": error_message
     })
+
+
+@app.on_event("shutdown")
+async def shutdown_event():
+    await parts_db.close()
