@@ -3,43 +3,74 @@ import CompatibilityView from './CompatibilityView';
 import ShoppingResults from './ShoppingResults';
 import AnimatedStats from './AnimatedStats';
 import InteractivePartCard from './InteractivePartCard';
-import { refreshTabs } from './TabManager';
 import './OCRResult.css';
 
 const OCRResult = ({ result, selectedPart, onPartClick, loading }) => {
     const [showStats, setShowStats] = useState(false);
     const [showPartCard, setShowPartCard] = useState(false);
     const [activeTab, setActiveTab] = useState('compatibility');
+    const [loadingSteps, setLoadingSteps] = useState(0);
+
+    // Enhanced loading animation
+    useEffect(() => {
+        if (loading) {
+            const stepInterval = setInterval(() => {
+                setLoadingSteps(prev => {
+                    if (prev >= 3) {
+                        clearInterval(stepInterval);
+                        return 3;
+                    }
+                    return prev + 1;
+                });
+            }, 800);
+
+            return () => clearInterval(stepInterval);
+        } else {
+            setLoadingSteps(0);
+        }
+    }, [loading]);
 
     useEffect(() => {
         if (result && !result.error) {
+            // Reset states
+            setShowStats(false);
+            setShowPartCard(false);
+            
             // Trigger animations with delays
             setTimeout(() => setShowStats(true), 500);
             setTimeout(() => setShowPartCard(true), 1200);
         }
     }, [result]);
 
-    useEffect(() => {
-        if (selectedPart) {
-            refreshTabs();
-        }
-    }, [selectedPart]);
-
+    // Enhanced tab switching with visual feedback
     const handleTabSwitch = (tabName) => {
         setActiveTab(tabName);
-        // Add visual feedback
-        const buttons = document.querySelectorAll('.tab-btn');
-        const panels = document.querySelectorAll('.tab-panel');
         
-        buttons.forEach(btn => btn.classList.remove('active'));
-        panels.forEach(panel => panel.classList.remove('active'));
-        
-        const activeButton = document.querySelector(`[data-tab="${tabName}"]`);
-        const activePanel = document.getElementById(tabName);
-        
-        if (activeButton && activePanel) {
-            activeButton.classList.add('active');
-            activePanel.classList.add('active');
+        // Add ripple effect
+        const button = document.querySelector(`[data-tab="${tabName}"]`);
+        if (button) {
+            button.style.transform = 'scale(0.95)';
+            setTimeout(() => {
+                button.style.transform = 'scale(1)';
+            }, 150);
+        }
+    };
+
+    // Enhanced part click with visual feedback
+    const handlePartClick = (partNumber) => {
+        if (onPartClick) {
+            // Add click animation
+            const partChip = document.querySelector('.highlighted-part');
+            if (partChip) {
+                partChip.style.transform = 'scale(1.1)';
+                partChip.style.boxShadow = '0 0 20px rgba(0, 212, 255, 0.8)';
+                setTimeout(() => {
+                    partChip.style.transform = 'scale(1)';
+                    partChip.style.boxShadow = '';
+                }, 300);
+            }
+            
+            onPartClick(partNumber);
         }
     };
 
@@ -57,21 +88,35 @@ const OCRResult = ({ result, selectedPart, onPartClick, loading }) => {
                     </div>
                     <div className="loading-text">
                         <h3>🔍 Analyzing Your Part</h3>
-                        <p>AI is examining the image with advanced computer vision</p>
+                        <p>Advanced AI is examining the image with computer vision</p>
                         <div className="loading-steps">
-                            <div className="step active">📷 Image Processing</div>
-                            <div className="step">🔤 Text Recognition</div>
-                            <div className="step">🧠 AI Analysis</div>
-                            <div className="step">🗄️ Database Search</div>
+                            <div className={`step ${loadingSteps >= 0 ? 'active' : ''}`}>
+                                📷 Image Processing
+                                {loadingSteps >= 0 && <span className="checkmark">✓</span>}
+                            </div>
+                            <div className={`step ${loadingSteps >= 1 ? 'active' : ''}`}>
+                                🔤 OCR Text Recognition
+                                {loadingSteps >= 1 && <span className="checkmark">✓</span>}
+                            </div>
+                            <div className={`step ${loadingSteps >= 2 ? 'active' : ''}`}>
+                                🧠 AI Visual Analysis
+                                {loadingSteps >= 2 && <span className="checkmark">✓</span>}
+                            </div>
+                            <div className={`step ${loadingSteps >= 3 ? 'active' : ''}`}>
+                                🗄️ Database Matching
+                                {loadingSteps >= 3 && <span className="checkmark">✓</span>}
+                            </div>
                         </div>
                     </div>
                 </div>
                 <div className="loading-particles">
-                    <div className="particle"></div>
-                    <div className="particle"></div>
-                    <div className="particle"></div>
-                    <div className="particle"></div>
-                    <div className="particle"></div>
+                    {[...Array(8)].map((_, i) => (
+                        <div key={i} className="particle" style={{
+                            animationDelay: `${i * 0.3}s`,
+                            left: `${10 + i * 10}%`,
+                            top: `${20 + (i % 3) * 20}%`
+                        }}></div>
+                    ))}
                 </div>
             </div>
         );
@@ -110,7 +155,7 @@ const OCRResult = ({ result, selectedPart, onPartClick, loading }) => {
     return (
         <div className="ocr-result enhanced">
             
-            {/* Error Display with Enhanced Styling */}
+            {/* Error Display */}
             {hasError && (
                 <div className="error-section enhanced-error">
                     <div className="error-animation">
@@ -141,7 +186,7 @@ const OCRResult = ({ result, selectedPart, onPartClick, loading }) => {
             {/* Success Flow */}
             {!hasError && (
                 <>
-                    {/* Animated Stats Section */}
+                    {/* Animated Stats */}
                     <AnimatedStats
                         textsFound={result.texts_found || 0}
                         confidence={result.overall_confidence ? Math.round(result.overall_confidence * 100) : 0}
@@ -164,8 +209,11 @@ const OCRResult = ({ result, selectedPart, onPartClick, loading }) => {
                                     <div 
                                         key={index}
                                         className={`text-chip ${text === result.part_number ? 'highlighted-part' : ''}`}
-                                        onClick={() => text === result.part_number && onPartClick && onPartClick(text)}
-                                        style={{ animationDelay: `${index * 0.1}s` }}
+                                        onClick={() => text === result.part_number && handlePartClick(text)}
+                                        style={{ 
+                                            animationDelay: `${index * 0.1}s`,
+                                            cursor: text === result.part_number ? 'pointer' : 'default'
+                                        }}
                                     >
                                         <span className="chip-content">{text}</span>
                                         {text === result.part_number && (
@@ -195,7 +243,7 @@ const OCRResult = ({ result, selectedPart, onPartClick, loading }) => {
                     {hasAiAnalysis && (
                         <InteractivePartCard
                             partData={result}
-                            onPartClick={onPartClick}
+                            onPartClick={handlePartClick}
                             isVisible={showPartCard}
                         />
                     )}
@@ -248,15 +296,10 @@ const OCRResult = ({ result, selectedPart, onPartClick, loading }) => {
                                 <h3>
                                     <span className="header-icon">🚗</span>
                                     Vehicle Compatibility & Shopping
-                                    <div className="loading-dots">
-                                        <span className="dot"></span>
-                                        <span className="dot"></span>
-                                        <span className="dot"></span>
-                                    </div>
                                 </h3>
                             </div>
                             
-                            {/* Tabbed Interface */}
+                            {/* Functional Tabbed Interface */}
                             <div className="enhanced-tabs">
                                 <div className="tab-nav">
                                     <button 
@@ -280,20 +323,24 @@ const OCRResult = ({ result, selectedPart, onPartClick, loading }) => {
                                 </div>
                                 
                                 <div className="tab-content">
-                                    <div className={`tab-panel ${activeTab === 'compatibility' ? 'active' : ''}`} id="compatibility">
-                                        <CompatibilityView
-                                            data={result}
-                                            loading={false}
-                                            error={null}
-                                        />
-                                    </div>
-                                    <div className={`tab-panel ${activeTab === 'shopping' ? 'active' : ''}`} id="shopping">
-                                        <ShoppingResults
-                                            partData={result}
-                                            loading={false}
-                                            error={null}
-                                        />
-                                    </div>
+                                    {activeTab === 'compatibility' && (
+                                        <div className="tab-panel active" id="compatibility">
+                                            <CompatibilityView
+                                                data={result}
+                                                loading={false}
+                                                error={null}
+                                            />
+                                        </div>
+                                    )}
+                                    {activeTab === 'shopping' && (
+                                        <div className="tab-panel active" id="shopping">
+                                            <ShoppingResults
+                                                partData={result}
+                                                loading={false}
+                                                error={null}
+                                            />
+                                        </div>
+                                    )}
                                 </div>
                             </div>
                         </div>
@@ -308,7 +355,7 @@ const OCRResult = ({ result, selectedPart, onPartClick, loading }) => {
                                     <p>Discover vehicle compatibility and find the best prices</p>
                                 </div>
                                 <button
-                                    onClick={() => onPartClick && onPartClick(result.part_number)}
+                                    onClick={() => handlePartClick(result.part_number)}
                                     className="cta-button mega"
                                 >
                                     <div className="button-bg"></div>
@@ -330,21 +377,6 @@ const OCRResult = ({ result, selectedPart, onPartClick, loading }) => {
                             <div className="cta-background">
                                 <div className="bg-circle circle-1"></div>
                                 <div className="bg-circle circle-2"></div>
-                                <div className="bg-circuit">
-                                    <svg viewBox="0 0 400 200" className="circuit-pattern">
-                                        <defs>
-                                            <linearGradient id="circuit-grad" x1="0%" y1="0%" x2="100%" y2="0%">
-                                                <stop offset="0%" stopColor="rgba(102, 126, 234, 0.3)" />
-                                                <stop offset="50%" stopColor="rgba(139, 92, 246, 0.5)" />
-                                                <stop offset="100%" stopColor="rgba(102, 126, 234, 0.3)" />
-                                            </linearGradient>
-                                        </defs>
-                                        <path d="M0,100 Q100,50 200,100 T400,100" stroke="url(#circuit-grad)" strokeWidth="2" fill="none" className="circuit-line" />
-                                        <circle cx="100" cy="75" r="3" fill="var(--accent-blue)" className="circuit-node" />
-                                        <circle cx="200" cy="100" r="3" fill="var(--accent-purple)" className="circuit-node" />
-                                        <circle cx="300" cy="75" r="3" fill="var(--accent-green)" className="circuit-node" />
-                                    </svg>
-                                </div>
                             </div>
                         </div>
                     )}
