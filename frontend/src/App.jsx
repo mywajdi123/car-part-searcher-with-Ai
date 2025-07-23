@@ -106,7 +106,7 @@ function App() {
     <div className="app-container">
       <div className="main-content">
         <div className="header">
-          <h1>🔧 Car Parts AI</h1>
+          <h1>🔧 Car Parts Search With Ai</h1>
           <p>Upload a photo of your car part to identify it and find where to buy it</p>
         </div>
 
