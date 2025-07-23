@@ -15,7 +15,7 @@ const setupTabs = () => {
   if (tabButtons.length === 0) return;
 
   // Add click event listeners to tab buttons
-  tabButtons.forEach((button, index) => {
+  tabButtons.forEach((button) => {
     button.addEventListener('click', () => {
       const targetTab = button.getAttribute('data-tab');
       switchTab(targetTab, tabButtons, tabPanels);

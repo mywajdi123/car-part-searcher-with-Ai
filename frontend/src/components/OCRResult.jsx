@@ -7,10 +7,9 @@ import { refreshTabs } from './TabManager';
 import './OCRResult.css';
 
 const OCRResult = ({ result, selectedPart, onPartClick, loading }) => {
-    const [compatibilityLoading, setCompatibilityLoading] = useState(false);
-    const [compatibilityError, setCompatibilityError] = useState(null);
     const [showStats, setShowStats] = useState(false);
     const [showPartCard, setShowPartCard] = useState(false);
+    const [activeTab, setActiveTab] = useState('compatibility');
 
     useEffect(() => {
         if (result && !result.error) {
@@ -19,6 +18,30 @@ const OCRResult = ({ result, selectedPart, onPartClick, loading }) => {
             setTimeout(() => setShowPartCard(true), 1200);
         }
     }, [result]);
+
+    useEffect(() => {
+        if (selectedPart) {
+            refreshTabs();
+        }
+    }, [selectedPart]);
+
+    const handleTabSwitch = (tabName) => {
+        setActiveTab(tabName);
+        // Add visual feedback
+        const buttons = document.querySelectorAll('.tab-btn');
+        const panels = document.querySelectorAll('.tab-panel');
+        
+        buttons.forEach(btn => btn.classList.remove('active'));
+        panels.forEach(panel => panel.classList.remove('active'));
+        
+        const activeButton = document.querySelector(`[data-tab="${tabName}"]`);
+        const activePanel = document.getElementById(tabName);
+        
+        if (activeButton && activePanel) {
+            activeButton.classList.add('active');
+            activePanel.classList.add('active');
+        }
+    };
 
     if (loading) {
         return (
@@ -236,12 +259,20 @@ const OCRResult = ({ result, selectedPart, onPartClick, loading }) => {
                             {/* Tabbed Interface */}
                             <div className="enhanced-tabs">
                                 <div className="tab-nav">
-                                    <button className="tab-btn active" data-tab="compatibility">
+                                    <button 
+                                        className={`tab-btn ${activeTab === 'compatibility' ? 'active' : ''}`}
+                                        data-tab="compatibility"
+                                        onClick={() => handleTabSwitch('compatibility')}
+                                    >
                                         <span className="tab-icon">🚗</span>
                                         <span className="tab-text">Compatibility</span>
                                         <div className="tab-indicator"></div>
                                     </button>
-                                    <button className="tab-btn" data-tab="shopping">
+                                    <button 
+                                        className={`tab-btn ${activeTab === 'shopping' ? 'active' : ''}`}
+                                        data-tab="shopping"
+                                        onClick={() => handleTabSwitch('shopping')}
+                                    >
                                         <span className="tab-icon">🛒</span>
                                         <span className="tab-text">Where to Buy</span>
                                         <div className="tab-indicator"></div>
@@ -249,18 +280,18 @@ const OCRResult = ({ result, selectedPart, onPartClick, loading }) => {
                                 </div>
                                 
                                 <div className="tab-content">
-                                    <div className="tab-panel active" id="compatibility">
+                                    <div className={`tab-panel ${activeTab === 'compatibility' ? 'active' : ''}`} id="compatibility">
                                         <CompatibilityView
                                             data={result}
-                                            loading={compatibilityLoading}
-                                            error={compatibilityError}
+                                            loading={false}
+                                            error={null}
                                         />
                                     </div>
-                                    <div className="tab-panel" id="shopping">
+                                    <div className={`tab-panel ${activeTab === 'shopping' ? 'active' : ''}`} id="shopping">
                                         <ShoppingResults
                                             partData={result}
-                                            loading={compatibilityLoading}
-                                            error={compatibilityError}
+                                            loading={false}
+                                            error={null}
                                         />
                                     </div>
                                 </div>
