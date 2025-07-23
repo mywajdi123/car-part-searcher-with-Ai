@@ -1,38 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import CompatibilityView from './CompatibilityView';
-import './OCRResult.css';
 import ShoppingResults from './ShoppingResults';
+import './OCRResult.css';
 
 const OCRResult = ({ result, selectedPart, onPartClick, loading }) => {
     const [compatibilityLoading, setCompatibilityLoading] = useState(false);
     const [compatibilityError, setCompatibilityError] = useState(null);
-    const [partSearchResults, setPartSearchResults] = useState(null);
 
-    // Search for additional part info when a part is selected
-    useEffect(() => {
-        if (selectedPart && result?.part_number) {
-            searchPartInfo(result.part_number);
-        }
-    }, [selectedPart, result?.part_number]);
-
-    const searchPartInfo = async (partNumber) => {
-        setCompatibilityLoading(true);
-        setCompatibilityError(null);
-
-        try {
-            const response = await fetch(`/partinfo/?part_number=${encodeURIComponent(partNumber)}`);
-            if (!response.ok) {
-                throw new Error(`HTTP error! status: ${response.status}`);
-            }
-            const data = await response.json();
-            setPartSearchResults(data);
-        } catch (error) {
-            console.error('Error fetching part info:', error);
-            setCompatibilityError('Failed to fetch additional part information');
-        } finally {
-            setCompatibilityLoading(false);
-        }
-    };
+    // Remove this useEffect since we don't need the searchPartInfo function anymore
+    // The ShoppingResults component handles shopping data internally
 
     if (loading) {
         return (
@@ -195,7 +171,7 @@ const OCRResult = ({ result, selectedPart, onPartClick, loading }) => {
                 </div>
             )}
 
-            {/* Compatibility Section */}
+            {/* Compatibility and Shopping Section - Only show once when part is selected */}
             {selectedPart && (
                 <div className="section compatibility-section">
                     <h3>🚗 Compatibility Information</h3>
@@ -204,71 +180,15 @@ const OCRResult = ({ result, selectedPart, onPartClick, loading }) => {
                         loading={compatibilityLoading}
                         error={compatibilityError}
                     />
-
-                    {/* Additional Search Results */}
-                    {partSearchResults && (
-                        <div className="additional-results">
-                            <h4>🛒 Shopping Results</h4>
-                            <div className="search-links">
-                                <a
-                                    href={partSearchResults.google_url}
-                                    target="_blank"
-                                    rel="noopener noreferrer"
-                                    className="search-link google"
-                                >
-                                    🔍 Google Search
-                                </a>
-                                <a
-                                    href={partSearchResults.ebay_url}
-                                    target="_blank"
-                                    rel="noopener noreferrer"
-                                    className="search-link ebay"
-                                >
-                                    🛍️ eBay Search
-                                </a>
-                                <a
-                                    href={partSearchResults.amazon_url}
-                                    target="_blank"
-                                    rel="noopener noreferrer"
-                                    className="search-link amazon"
-                                >
-                                    📦 Amazon Search
-                                </a>
-                            </div>
-
-                            {partSearchResults.ebay_results && partSearchResults.ebay_results.length > 0 && (
-                                <div className="ebay-results">
-                                    <h5>eBay Listings ({partSearchResults.ebay_results.length})</h5>
-                                    <div className="listings-grid">
-                                        {partSearchResults.ebay_results.slice(0, 3).map((item, index) => (
-                                            <div key={index} className="listing-card">
-                                                {item.image_url && (
-                                                    <img
-                                                        src={item.image_url}
-                                                        alt={item.title}
-                                                        className="listing-image"
-                                                        onError={(e) => e.target.style.display = 'none'}
-                                                    />
-                                                )}
-                                                <div className="listing-content">
-                                                    <h6>{item.title}</h6>
-                                                    <p className="price">{item.price}</p>
-                                                    <a
-                                                        href={item.listing_url}
-                                                        target="_blank"
-                                                        rel="noopener noreferrer"
-                                                        className="view-listing"
-                                                    >
-                                                        View Listing
-                                                    </a>
-                                                </div>
-                                            </div>
-                                        ))}
-                                    </div>
-                                </div>
-                            )}
-                        </div>
-                    )}
+                    
+                    {/* Shopping Results - integrated into compatibility section */}
+                    <div className="shopping-section">
+                        <ShoppingResults
+                            partData={result}
+                            loading={compatibilityLoading}
+                            error={compatibilityError}
+                        />
+                    </div>
                 </div>
             )}
 

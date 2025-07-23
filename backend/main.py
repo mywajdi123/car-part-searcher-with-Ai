@@ -11,7 +11,6 @@ import httpx
 from car_ai import CarPartAI
 import os
 from dotenv import load_dotenv
-from parts_database import parts_db
 
 # Load environment variables
 load_dotenv(dotenv_path=os.path.join(os.path.dirname(__file__), ".env"))
@@ -21,7 +20,7 @@ app = FastAPI()
 # Initialize AI detector
 car_ai = CarPartAI()
 
-# Enable CORS for frontend dev (safe even if using Vite proxy)
+# Enable CORS for frontend dev
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
@@ -30,6 +29,8 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+# Import parts database AFTER app initialization
+from parts_database import parts_db
 
 def extract_part_numbers(texts):
     part_patterns = [
@@ -71,13 +72,10 @@ def read_root():
 async def predict_api(file: UploadFile = File(...)):
     return await process_image(file)
 
-# Optional: legacy route still works
-
 
 @app.post("/upload/")
 async def upload_image(file: UploadFile = File(...)):
     return await process_image(file)
-
 
 async def process_image(file: UploadFile):
     try:
@@ -95,21 +93,25 @@ async def process_image(file: UploadFile):
 
         reader = easyocr.Reader(['en'], gpu=False)
         result = reader.readtext(np_img)
-        detected_texts = [
-            text for (_, text, confidence) in result if confidence > 0.5]
+        detected_texts = [text for (_, text, confidence) in result if confidence > 0.5]
 
         # Extract part numbers using existing function
         part_number = extract_part_numbers(detected_texts)
-
-        # Get AI analysis with enhanced compatibility detection
+        
+        # Get AI analysis
         ai_analysis = await car_ai.identify_car_part(content, detected_texts)
-
+        
         # Search parts database for additional compatibility info
         database_result = None
         if part_number:
             database_result = await parts_db.search_part_by_number(part_number)
-
-        # Combine AI analysis with database results
+        elif detected_texts:  # Try searching with any detected text
+            for text in detected_texts:
+                database_result = await parts_db.search_part_by_number(text)
+                if database_result:
+                    break
+        
+        # Create enhanced response
         enhanced_response = {
             "filename": file.filename,
             "size_kb": size_kb,
@@ -117,11 +119,11 @@ async def process_image(file: UploadFile):
             "detected_texts": detected_texts,
             "part_number": part_number,
             "texts_found": len(detected_texts),
-
+            
             # Enhanced AI analysis
             "ai_analysis": ai_analysis,
-
-            # Database compatibility results
+            
+            # Database compatibility results  
             "database_result": {
                 "found": database_result is not None,
                 "data": {
@@ -130,7 +132,7 @@ async def process_image(file: UploadFile):
                     "compatibility": [
                         {
                             "make": comp.make,
-                            "model": comp.model,
+                            "model": comp.model, 
                             "years": comp.years,
                             "engines": comp.engines,
                             "confidence": comp.confidence,
@@ -143,18 +145,18 @@ async def process_image(file: UploadFile):
                             "brand": part.brand,
                             "type": part.type,
                             "price_range": part.price_range
-                        } for part in database_result.interchangeable
+                        } for part in database_result.interchangeable  
                     ] if database_result else [],
                     "specifications": database_result.specifications if database_result else {}
                 } if database_result else None
             },
-
+            
             # Combined confidence score
             "overall_confidence": (
-                (ai_analysis.get('confidence_scores', {}).get('overall', 0.5) +
+                (ai_analysis.get('confidence', 0.5) + 
                  (database_result.confidence if database_result else 0.3)) / 2
             ),
-
+            
             # Data sources used
             "sources": {
                 "ocr": "easyocr",
@@ -228,3 +230,4 @@ async def part_info(part_number: str):
 @app.on_event("shutdown")
 async def shutdown_event():
     await parts_db.close()
+    

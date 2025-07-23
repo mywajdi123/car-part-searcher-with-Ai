@@ -50,18 +50,18 @@ function App() {
       // Use the new enhanced endpoint
       const endpoint = `${API_URL}/api/predict`;
       console.log("Posting to:", endpoint);
-      
+
       const res = await fetch(endpoint, {
         method: 'POST',
         body: formData,
       });
 
       const data = await res.json();
-      
+
       if (res.ok) {
         setResponse(data);
         setCompatibilityData(data); // Store the enhanced data
-        
+
         // Auto-select part if one was found
         if (data.part_number) {
           setSelectedPart(data.part_number);
@@ -147,8 +147,8 @@ function App() {
         {/* Enhanced Results Section using OCRResult component */}
         {response && (
           <div className="results-section">
-            <OCRResult 
-              result={response} 
+            <OCRResult
+              result={response}
               selectedPart={selectedPart}
               onPartClick={handlePartClick}
               loading={loading}
@@ -256,7 +256,7 @@ function App() {
         {selectedPart && compatibilityData && !response?.ai_analysis && (
           <div className="compatibility-section">
             <h2>🚗 Compatibility Information</h2>
-            <CompatibilityView 
+            <CompatibilityView
               data={compatibilityData}
               loading={false}
               error={null}
