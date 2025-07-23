@@ -3,6 +3,7 @@ import CompatibilityView from './CompatibilityView';
 import ShoppingResults from './ShoppingResults';
 import AnimatedStats from './AnimatedStats';
 import InteractivePartCard from './InteractivePartCard';
+import { refreshTabs } from './TabManager';
 import './OCRResult.css';
 
 const OCRResult = ({ result, selectedPart, onPartClick, loading }) => {
