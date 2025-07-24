@@ -130,18 +130,19 @@ body {
   width: 100%;
 }
 
-/* DESKTOP: Simple 2-column layout */
+/* DESKTOP: 3-column layout for better space utilization */
 @media (min-width: 1024px) {
   .main-content {
     display: flex;
-    gap: 3rem;
+    gap: 2rem;
     align-items: flex-start;
     padding: 2rem 3rem;
+    max-width: 100%;
   }
   
   /* Left column: Upload + Stats (fixed width) */
   .left-column {
-    flex: 0 0 400px;
+    flex: 0 0 320px;
     display: flex;
     flex-direction: column;
     gap: 2rem;
@@ -150,14 +151,41 @@ body {
     height: fit-content;
   }
   
-  /* Right column: Results (flexible width) */
+  /* Middle column: Main Results (flexible width) */
   .right-column {
     flex: 1;
-    min-width: 0; /* Prevent flex item from overflowing */
+    min-width: 0;
+    display: flex;
+    gap: 2rem;
+  }
+  
+  /* Split right column into main results and compatibility */
+  .results-main {
+    flex: 1;
+    min-width: 400px;
+  }
+  
+  .results-sidebar {
+    flex: 0 0 350px;
+    position: sticky;
+    top: 2rem;
+    height: fit-content;
   }
   
   .header {
     margin-bottom: 2rem;
+  }
+}
+
+/* For smaller desktop screens, stack vertically */
+@media (min-width: 1024px) and (max-width: 1400px) {
+  .right-column {
+    flex-direction: column;
+  }
+  
+  .results-sidebar {
+    flex: none;
+    position: static;
   }
 }
 
@@ -414,46 +442,54 @@ body {
   border-color: rgba(255, 255, 255, 0.2);
 }
 
-/* Success Summary */
+/* Success Summary - Fixed for Quick Stats */
 .result-summary {
-  background: var(--success-gradient);
-  border: none;
-  color: white;
+  background: var(--bg-glass);
+  backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: var(--text-primary);
 }
 
 .summary-header h2 {
-  font-size: 2rem;
+  font-size: 1.5rem;
   font-weight: 700;
   margin-bottom: 1.5rem;
-  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+  color: var(--text-primary);
 }
 
 .summary-stats {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-  gap: 1.5rem;
+  grid-template-columns: 1fr;
+  gap: 1rem;
 }
 
 .stat {
   text-align: center;
   padding: 1rem;
-  background: rgba(255, 255, 255, 0.1);
+  background: rgba(102, 126, 234, 0.1);
+  border: 1px solid rgba(102, 126, 234, 0.3);
   border-radius: 12px;
   backdrop-filter: blur(10px);
   transition: var(--transition-smooth);
 }
 
 .stat:hover {
-  transform: translateY(-5px);
-  background: rgba(255, 255, 255, 0.2);
+  transform: translateY(-2px);
+  background: rgba(102, 126, 234, 0.15);
+  border-color: rgba(102, 126, 234, 0.4);
 }
 
 .stat strong {
   display: block;
-  font-size: 2rem;
+  font-size: 1.5rem;
   font-weight: 800;
   margin-bottom: 0.25rem;
-  color: white;
+  color: var(--accent-blue);
+}
+
+.stat {
+  color: var(--text-secondary);
+  font-size: 0.875rem;
 }
 
 /* Text Badges - Horizontal layout */
