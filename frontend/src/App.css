@@ -1,4 +1,4 @@
-/* Modern Car Parts AI - Eye-catching Design */
+/* Modern Car Parts AI - Simple Horizontal Layout (AutoZone Style) */
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap');
 
 :root {
@@ -111,21 +111,54 @@ body {
   100% { transform: translateY(0px) translateX(0px); }
 }
 
-/* Main Content */
+/* MAIN CONTAINER - AUTOZONE STYLE LAYOUT */
 .main-content {
   position: relative;
   z-index: 1;
+  width: 100%;
   max-width: 1400px;
   margin: 0 auto;
   padding: 2rem;
-  min-height: 100vh;
+  min-height: calc(100vh - 200px);
 }
 
-/* Header Styles */
+/* Header spans full width */
 .header {
   text-align: center;
-  margin-bottom: 4rem;
+  margin-bottom: 3rem;
   padding: 2rem 0;
+  width: 100%;
+}
+
+/* DESKTOP: Simple 2-column layout */
+@media (min-width: 1024px) {
+  .main-content {
+    display: flex;
+    gap: 3rem;
+    align-items: flex-start;
+    padding: 2rem 3rem;
+  }
+  
+  /* Left column: Upload + Stats (fixed width) */
+  .left-column {
+    flex: 0 0 400px;
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+    position: sticky;
+    top: 2rem;
+    height: fit-content;
+  }
+  
+  /* Right column: Results (flexible width) */
+  .right-column {
+    flex: 1;
+    min-width: 0; /* Prevent flex item from overflowing */
+  }
+  
+  .header {
+    margin-bottom: 2rem;
+  }
 }
 
 .header h1 {
@@ -282,9 +315,9 @@ body {
 }
 
 .preview-image {
-  max-width: 400px;
+  max-width: 100%;
   max-height: 300px;
-  width: 100%;
+  width: auto;
   height: auto;
   border-radius: 16px;
   box-shadow: var(--shadow-elevated);
@@ -300,9 +333,6 @@ body {
 /* Analyze Button */
 .analyze-button {
   width: 100%;
-  max-width: 400px;
-  margin: 0 auto;
-  display: block;
   padding: 1.25rem 2rem;
   font-size: 1.25rem;
   font-weight: 600;
@@ -347,9 +377,10 @@ body {
   transform: none;
 }
 
-/* Results Section */
+/* Results Section - Full width on desktop */
 .results-section {
   animation: slideInUp 0.6s ease-out 0.2s both;
+  width: 100%;
 }
 
 /* Glass Card Effect */
@@ -364,6 +395,7 @@ body {
   transition: var(--transition-smooth);
   position: relative;
   overflow: hidden;
+  width: 100%;
 }
 
 .section::before {
@@ -398,7 +430,7 @@ body {
 
 .summary-stats {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
   gap: 1.5rem;
 }
 
@@ -424,7 +456,7 @@ body {
   color: white;
 }
 
-/* Text Badges */
+/* Text Badges - Horizontal layout */
 .texts-container {
   display: flex;
   flex-wrap: wrap;
@@ -443,6 +475,7 @@ body {
   transition: var(--transition-smooth);
   position: relative;
   overflow: hidden;
+  flex-shrink: 0;
 }
 
 .text-badge::before {
@@ -482,10 +515,10 @@ body {
   box-shadow: 0 10px 20px rgba(0, 212, 255, 0.3);
 }
 
-/* AI Analysis Grid */
+/* AI Analysis Grid - Horizontal layout */
 .ai-quick-results {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
   gap: 1.5rem;
   margin-bottom: 1.5rem;
 }
@@ -548,10 +581,48 @@ body {
   box-shadow: var(--shadow-elevated);
 }
 
+/* Shopping and Compatibility sections - side by side */
+@media (min-width: 1024px) {
+  .shopping-compatibility-container {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 2rem;
+    margin-top: 2rem;
+  }
+  
+  .shopping-section,
+  .compatibility-section {
+    margin-bottom: 0;
+  }
+}
+
 /* Responsive Design */
+@media (max-width: 1023px) {
+  .main-content {
+    display: block;
+    padding: 1rem;
+  }
+  
+  .header {
+    margin-bottom: 3rem;
+  }
+  
+  .upload-section {
+    margin-bottom: 3rem;
+  }
+  
+  .summary-stats {
+    grid-template-columns: 1fr;
+  }
+  
+  .ai-quick-results {
+    grid-template-columns: 1fr;
+  }
+}
+
 @media (max-width: 768px) {
   .main-content {
-    padding: 1rem;
+    padding: 0.5rem;
   }
   
   .header h1 {
@@ -564,14 +635,6 @@ body {
   
   .section {
     padding: 1.5rem;
-  }
-  
-  .summary-stats {
-    grid-template-columns: 1fr;
-  }
-  
-  .ai-quick-results {
-    grid-template-columns: 1fr;
   }
 }
 
@@ -590,5 +653,9 @@ body {
   
   .upload-text {
     font-size: 1.25rem;
+  }
+  
+  .section {
+    padding: 1rem;
   }
 }
