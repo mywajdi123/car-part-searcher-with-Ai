@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import './App.css';
 import OCRResult from './components/OCRResult';
 import CompatibilityView from './components/CompatibilityView';
@@ -14,6 +14,29 @@ function App() {
   const [lookupLoading, setLookupLoading] = useState(false);
   const [selectedPart, setSelectedPart] = useState(null);
   const [compatibilityData, setCompatibilityData] = useState(null);
+  const [showNavbar, setShowNavbar] = useState(false);
+
+  // Scroll detection for navbar
+  useEffect(() => {
+    const handleScroll = () => {
+      const scrollPosition = window.scrollY;
+      const headerHeight = 300; // Approximate header height
+      
+      if (scrollPosition > headerHeight) {
+        setShowNavbar(true);
+        document.body.classList.add('navbar-visible');
+      } else {
+        setShowNavbar(false);
+        document.body.classList.remove('navbar-visible');
+      }
+    };
+
+    window.addEventListener('scroll', handleScroll);
+    return () => {
+      window.removeEventListener('scroll', handleScroll);
+      document.body.classList.remove('navbar-visible');
+    };
+  }, []);
 
   const handleFileChange = (e) => {
     const selectedFile = e.target.files[0];
@@ -104,6 +127,62 @@ function App() {
 
   return (
     <div className="app-container">
+      {/* Sticky Navbar */}
+      <nav className={`navbar ${showNavbar ? 'visible' : ''}`}>
+        <div className="navbar-content">
+          <a href="#" className="navbar-brand" onClick={(e) => {
+            e.preventDefault();
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+          }}>
+            <span className="navbar-icon">🔧</span>
+            <span className="navbar-title">Car Parts Search With AI</span>
+          </a>
+          
+          <div className="navbar-nav">
+            <a href="#upload" className="nav-item" onClick={(e) => {
+              e.preventDefault();
+              document.querySelector('.upload-section')?.scrollIntoView({ behavior: 'smooth' });
+            }}>
+              Upload
+            </a>
+            {response && (
+              <a href="#results" className="nav-item" onClick={(e) => {
+                e.preventDefault();
+                document.querySelector('.results-section')?.scrollIntoView({ behavior: 'smooth' });
+              }}>
+                Results
+              </a>
+            )}
+            {(selectedPart || partLinks) && (
+              <a href="#shopping" className="nav-item" onClick={(e) => {
+                e.preventDefault();
+                document.querySelector('.shopping-section')?.scrollIntoView({ behavior: 'smooth' });
+              }}>
+                Shopping
+              </a>
+            )}
+          </div>
+
+          {/* Show quick stats in navbar when available */}
+          {response && !response.error && (
+            <div className="nav-stats">
+              <div className="nav-stat">
+                <span className="nav-stat-icon">📝</span>
+                <span className="nav-stat-value">{response.texts_found || 0}</span>
+                <span className="nav-stat-label">texts</span>
+              </div>
+              <div className="nav-stat">
+                <span className="nav-stat-icon">🎯</span>
+                <span className="nav-stat-value">
+                  {response.overall_confidence ? Math.round(response.overall_confidence * 100) : 0}%
+                </span>
+                <span className="nav-stat-label">confidence</span>
+              </div>
+            </div>
+          )}
+        </div>
+      </nav>
+
       {/* Header spans full width */}
       <div className="header">
         <h1>🔧 Car Parts Search With Ai</h1>
