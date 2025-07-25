@@ -129,37 +129,6 @@ API Docs: http://localhost:8000/docs
 - **AutoZone API** - Store inventory and pricing
 - **O'Reilly Auto Parts API** - Parts lookup and compatibility
 
-## 📁 Project Structure
-
-```
-car-parts-ai/
-├── src/
-│   ├── components/
-│   │   ├── OCRResult.jsx          # Enhanced results display
-│   │   ├── CompatibilityView.jsx  # Vehicle compatibility UI
-│   │   ├── ShoppingResults.jsx    # Shopping integration
-│   │   ├── AnimatedStats.jsx      # Real-time analytics
-│   │   └── InteractivePartCard.jsx # Part identification UI
-│   ├── styles/
-│   │   ├── App.css               # Main responsive layout
-│   │   ├── OCRResult.css         # Results component styles
-│   │   ├── CompatibilityView.css # Compatibility styling
-│   │   ├── ShoppingResults.css   # Shopping UI styles
-│   │   └── AnimatedStats.css     # Statistics animations
-│   ├── App.jsx                   # Main application component
-│   └── main.jsx                  # Application entry point
-├── backend/
-│   ├── main.py                   # FastAPI application
-│   ├── models/                   # AI models and data structures
-│   ├── services/                 # Business logic services
-│   ├── api/                      # API route handlers
-│   └── database/                 # Database models and queries
-├── public/                       # Static assets
-├── package.json                  # Frontend dependencies
-├── requirements.txt              # Backend dependencies
-└── README.md                     # This file
-```
-
 ## 🔧 How It Works
 
 ### 1. **Image Upload & Processing**
@@ -202,50 +171,6 @@ graph LR
 - **Response Time**: <2.5 seconds average processing
 - **Database Coverage**: 500,000+ parts across 15,000+ vehicle models
 - **API Reliability**: 99.2% uptime across shopping integrations
-
-## 🎯 Key Features for Recruiters
-
-### **Technical Excellence**
-- **Production-Ready Code**: Error handling, loading states, fallback systems
-- **Scalable Architecture**: Modular components, service-oriented design
-- **API-First Approach**: RESTful APIs with comprehensive FastAPI documentation
-- **Modern DevOps**: Docker-ready, environment configuration, CI/CD compatible
-
-### **AI/ML Implementation**
-- **Multi-Modal AI**: Combines OCR, computer vision, and structured data
-- **Real-Time Processing**: Optimized for speed with parallel OCR engines
-- **Confidence Scoring**: Transparent AI with accuracy metrics (85% displayed)
-- **Fallback Systems**: Robust error handling and graceful degradation
-
-### **Business Value**
-- **User Experience**: Intuitive 3-column layout reduces cognitive load
-- **Commercial Integration**: Real shopping APIs drive potential conversions
-- **Scalability**: Handles high-volume image processing efficiently
-- **Monetization Ready**: Affiliate integration with major auto parts retailers
-
-### **Real-World Results**
-- **Successful Part Recognition**: Toyota oil filter 90915-YZZD1 correctly identified
-- **Accurate Pricing**: Live prices from 4 major retailers
-- **Vehicle Compatibility**: Matches Toyota Camry, RAV4, Lexus ES350
-- **Professional UI**: Responsive design that works on all devices
-
-## 🚀 Deployment
-
-### **Docker Deployment**
-```bash
-# Build and run with Docker Compose
-docker-compose up --build
-
-# Or deploy individual services
-docker build -t car-parts-frontend .
-docker build -t car-parts-backend ./backend
-```
-
-### **Cloud Deployment**
-- **Frontend**: Vercel, Netlify, or AWS S3 + CloudFront
-- **Backend**: AWS EC2, Google Cloud Run, or Railway
-- **Database**: AWS RDS, PostgreSQL, or PlanetScale
-- **Storage**: AWS S3 for image storage and CDN delivery
 
 ## 🔐 Environment Variables
 
@@ -478,33 +403,16 @@ graph LR
 - **Scalability**: Handles high-volume image processing
 - **Monetization Ready**: Affiliate integration capabilities
 
-## 🚀 Deployment
-
-### **Docker Deployment**
-```bash
-# Build and run with Docker Compose
-docker-compose up --build
-
-# Or deploy individual services
-docker build -t car-parts-frontend .
-docker build -t car-parts-backend ./backend
-```
-
-### **Cloud Deployment**
-- **Frontend**: Vercel, Netlify, or AWS S3 + CloudFront
-- **Backend**: AWS EC2, Google Cloud Run, or Heroku
-- **Database**: AWS RDS, PostgreSQL, or MongoDB Atlas
-- **Storage**: AWS S3 for image storage and CDN
 
 ## 🔐 Environment Variables
 
-### Frontend (.env.local)
+### Frontend Setup (.env.local)
 ```bash
 VITE_API_URL=http://localhost:8000
 VITE_ENVIRONMENT=development
 ```
 
-### Backend (.env)
+### Backend Setup (.env)
 ```bash
 OPENAI_API_KEY=your_openai_key
 EBAY_APP_ID=your_ebay_app_id
@@ -512,34 +420,3 @@ AMAZON_ACCESS_KEY=your_amazon_key
 DATABASE_URL=sqlite:///./parts.db
 CORS_ORIGINS=http://localhost:5173
 ```
-
-## 🤝 Contributing
-
-1. Fork the repository
-2. Create a feature branch (`git checkout -b feature/amazing-feature`)
-3. Commit your changes (`git commit -m 'Add amazing feature'`)
-4. Push to the branch (`git push origin feature/amazing-feature`)
-5. Open a Pull Request
-
-## 📄 License
-
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
-
-## 👨‍💻 Developer
-
-**Your Name**
-- LinkedIn: [Your LinkedIn](https://linkedin.com/in/yourprofile)
-- Portfolio: [Your Portfolio](https://yourportfolio.com)
-- Email: your.email@example.com
-
----
-
-### 🌟 **Why This Project Stands Out**
-
-1. **Real-World Application**: Solves actual problems for car enthusiasts and mechanics
-2. **Technical Depth**: Combines multiple AI technologies effectively
-3. **Commercial Viability**: Integrated shopping features demonstrate business acumen
-4. **User-Centric Design**: Professional UI/UX with attention to detail
-5. **Scalable Architecture**: Built for growth and real-world deployment
-
-*This project demonstrates proficiency in full-stack development, AI/ML integration, API development, and modern web technologies while solving a practical problem in the automotive industry.*
