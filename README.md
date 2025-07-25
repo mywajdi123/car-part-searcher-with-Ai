@@ -86,18 +86,6 @@ API Docs: http://localhost:8000/docs
 - **SQLite/PostgreSQL**
 - **Pydantic**
 
-### **AI & Machine Learning**
-- **Computer Vision**: Custom CNN models for part classification
-- **Natural Language Processing**: Part description analysis
-- **Pattern Recognition**: Advanced part number detection algorithms
-- **Confidence Scoring**: ML-based accuracy assessment
-
-### **External APIs**
-- **eBay API** - Real-time listings and prices
-- **Amazon Product API** - Product search and pricing
-- **AutoZone API** - Store inventory and pricing
-- **O'Reilly Auto Parts API** - Parts lookup and compatibility
-
 ## 🔧 How It Works
 
 ### 1. **Image Upload & Processing**
@@ -119,28 +107,25 @@ graph LR
 - **Image Preprocessing**: Noise reduction, contrast enhancement, rotation correction
 - **Text Recognition**: Parallel processing with EasyOCR and Tesseract
 - **Visual Analysis**: CNN model identifies part type, condition, and characteristics
-- **Pattern Matching**: Advanced regex patterns for part number extraction (90915-YZZD1)
-- **Confidence Scoring**: ML algorithms assess identification accuracy (85% shown)
+- **Pattern Matching**: Advanced regex patterns for part number extraction
+- **Confidence Scoring**: ML algorithms assess identification accuracy
 
 ### 3. **Shopping Integration**
 - **Real-Time APIs**: Live calls to AutoZone, Amazon, eBay, O'Reilly
-- **Price Comparison**: Automated price analysis ($19.99 - $26.49 range)
-- **Inventory Checks**: Stock availability verification ("In Stock" indicators)
+- **Price Comparison**: Automated price analysis
+- **Inventory Checks**: Stock availability verification
 - **Alternative Parts**: Compatible part recommendations with ratings
 
 ### 4. **Vehicle Compatibility**
-- **Database Queries**: 500,000+ vehicle/part combinations
 - **Fuzzy Matching**: Intelligent search for similar parts
-- **Specification Matching**: Engine, trim, and year compatibility (2018-2023 Toyota models)
+- **Specification Matching**: Engine, trim, and year compatibility
 
 ## 📊 Performance Metrics
 
-- **OCR Accuracy**: 94.5% average text recognition (85% confidence shown in demo)
+- **OCR Accuracy**: 94.5% average text recognition with about 85% confidence
 - **Part Identification**: 87% successful part classification
 - **Response Time**: <2.5 seconds average processing
-- **Database Coverage**: 500,000+ parts across 15,000+ vehicle models
 - **API Reliability**: 99.2% uptime across shopping integrations
-
 
 
 ## 🔐 Environment Variables
