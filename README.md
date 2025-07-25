@@ -312,35 +312,6 @@ API Docs: http://localhost:8000/docs
 - **AutoZone API** - Store inventory and pricing
 - **Parts Database API** - Vehicle compatibility data
 
-## 📁 Project Structure
-
-```
-car-parts-ai/
-├── src/
-│   ├── components/
-│   │   ├── OCRResult.jsx          # Enhanced results display
-│   │   ├── CompatibilityView.jsx  # Vehicle compatibility
-│   │   ├── ShoppingResults.jsx    # Shopping integration
-│   │   ├── AnimatedStats.jsx      # Real-time analytics
-│   │   └── InteractivePartCard.jsx # Part identification UI
-│   ├── styles/
-│   │   ├── App.css               # Main application styles
-│   │   ├── OCRResult.css         # Results component styles
-│   │   └── [component].css       # Component-specific styles
-│   ├── App.jsx                   # Main application component
-│   └── main.jsx                  # Application entry point
-├── backend/
-│   ├── main.py                   # FastAPI application
-│   ├── models/                   # AI models and data structures
-│   ├── services/                 # Business logic services
-│   ├── api/                      # API route handlers
-│   └── database/                 # Database models and queries
-├── public/                       # Static assets
-├── package.json                  # Frontend dependencies
-├── requirements.txt              # Backend dependencies
-└── README.md                     # This file
-```
-
 ## 🔧 How It Works
 
 ### 1. **Image Upload & Processing**
