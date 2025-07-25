@@ -1,6 +1,7 @@
 # 🔧 Car Parts Search With AI
 
 An intelligent automotive parts identification system that uses computer vision, OCR, and machine learning to identify car parts from photos and help users find where to purchase them.
+<img width="1680" height="968" alt="AppRunning_Example" src="https://github.com/user-attachments/assets/91e26e61-7cbb-4847-8341-834267f06350" />
 
 ![Car Parts AI Demo](https://img.shields.io/badge/Status-Production%20Ready-brightgreen)
 ![React](https://img.shields.io/badge/React-18.0+-blue)
